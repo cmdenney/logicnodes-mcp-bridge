@@ -1,11 +1,11 @@
-# @logicnodes/mcp-bridge
+# @logicnodez/mcp-bridge
 
 Connect any MCP-compatible AI agent (Claude Desktop, Cursor, Windsurf, Cline, etc.) to the **LogicNodes x402 marketplace** — 365+ pay-per-call deterministic microservices.
 
 ## Install
 
 ```bash
-npx -y @logicnodes/mcp-bridge
+npx -y @logicnodez/mcp-bridge
 ```
 
 ## Claude Desktop config
@@ -15,7 +15,7 @@ npx -y @logicnodes/mcp-bridge
   "mcpServers": {
     "logicnodes": {
       "command": "npx",
-      "args": ["-y", "@logicnodes/mcp-bridge"],
+      "args": ["-y", "@logicnodez/mcp-bridge"],
       "env": {
         "LOGICNODES_API_KEY": "your-key-here"
       }

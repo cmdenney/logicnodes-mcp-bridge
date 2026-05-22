@@ -10,7 +10,7 @@ startCommand:
   commandFunction: |-
     (config) => ({
       command: 'npx',
-      args: ['-y', '@logicnodes/mcp-bridge'],
+      args: ['-y', '@logicnodez/mcp-bridge'],
       env: {
         ...(config.logicnodesApiKey ? { LOGICNODES_API_KEY: config.logicnodesApiKey } : {})
       }
