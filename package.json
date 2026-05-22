@@ -1,7 +1,7 @@
 {
   "name": "@logicnodez/mcp-bridge",
-  "version": "1.0.0",
-  "description": "MCP bridge for LogicNodes — 365+ pay-per-call AI microservices on Base, Solana, Arc, Arbitrum, Optimism, Polygon. Pay USDC via x402 protocol.",
+  "version": "1.0.1",
+  "description": "MCP bridge for LogicNodes \u2014 365+ pay-per-call AI microservices on Base, Solana, Arc, Arbitrum, Optimism, Polygon. Pay USDC via x402 protocol.",
   "main": "index.js",
   "bin": {
     "logicnodes-mcp": "./index.js"
@@ -33,5 +33,6 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "mcpName": "io.github.cmdenney/logicnodes-mcp-bridge"
 }
