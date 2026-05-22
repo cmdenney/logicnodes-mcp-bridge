@@ -1,0 +1,17 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      logicnodesApiKey:
+        type: string
+        description: 'Optional pre-paid API key. Leave blank to use x402 pay-per-call with USDC.'
+    required: []
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', '@logicnodes/mcp-bridge'],
+      env: {
+        ...(config.logicnodesApiKey ? { LOGICNODES_API_KEY: config.logicnodesApiKey } : {})
+      }
+    })
