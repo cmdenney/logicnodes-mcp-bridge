@@ -1,16 +1,18 @@
 {
   "name": "io.github.cmdenney/logicnodes-mcp-bridge",
-  "description": "LogicNodes x402 marketplace — 365+ pay-per-call deterministic microservices for AI agents. Live data from CoinGecko, DefiLlama, DexScreener, Alchemy, Helius. Pay USDC on Base, Arc, Arbitrum, Optimism, Polygon, Solana, Ethereum, World Chain. Micro $0.001 · Basic $0.05 · Standard $0.15 · Premium $0.50 USDC.",
+  "description": "LogicNodes x402 marketplace \u2014 619 deterministic microservices for AI agents. Finance, DeFi, Healthcare, Legal, Supply Chain, Energy, and more. Live data from CoinGecko, DefiLlama, Alchemy, Helius, EIA. Pay USDC on Base, Solana, Arc, Arbitrum, Optimism, Polygon, Ethereum, World Chain. No signup required. Micro $0.001 \u00b7 Basic $0.05 \u00b7 Standard $0.15 \u00b7 Premium $0.50 USDC.",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@logicnodez/mcp-bridge",
       "version": "1.0.1",
-      "transport": { "type": "stdio" },
+      "transport": {
+        "type": "stdio"
+      },
       "environmentVariables": [
         {
           "name": "LOGICNODES_API_KEY",
-          "description": "Optional pre-paid API key. Not required — services use x402 pay-per-call by default.",
+          "description": "Optional prepay API key. Not required \u2014 services use x402 pay-per-call by default. Get one at logicnodes.io for volume discounts.",
           "isRequired": false,
           "isSecret": true,
           "format": "string"
