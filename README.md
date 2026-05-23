@@ -4,11 +4,28 @@ Connect any MCP-compatible AI agent (Claude Desktop, Cursor, Windsurf, Cline, et
 
 ## Install
 
+### Node / MCP
 ```bash
 npx -y @logicnodez/mcp-bridge
 ```
 
-No API key needed. The bridge uses the **x402 protocol** — your agent's wallet pays per call automatically. Just install and go.
+### Python SDK
+```bash
+pip install logicnodes-m2m
+```
+
+```python
+from logicnodes_sdk import LogicNodesClient
+
+client = LogicNodesClient()
+result = await client.call_worker("fraud_detection_oracle", {
+    "amount_usd": 9500,
+    "transactions_last_1h": 7,
+    "country_mismatch": True
+})
+```
+
+No API key needed. The bridge uses the **x402 protocol** — your agent's wallet pays per call automatically.
 
 ## Claude Desktop config
 
@@ -28,8 +45,6 @@ No signup, no API key required. Your agent pays directly on-chain via x402:
 ```
 
 ### With API key (optional — prepay / volume discounts)
-
-If you have a LogicNodes API key (for prepay balance or volume pricing), pass it via env:
 
 ```json
 {
@@ -65,6 +80,19 @@ LogicNodes uses the [x402 payment protocol](https://x402.org). When your agent c
 3. The call completes — no accounts, no subscriptions, no prepay required
 
 No account is ever required. The API key is purely optional for users who prefer a prepay balance.
+
+## Attested Execution (coming soon)
+
+Select LogicNodes workers run inside **AWS Nitro Enclaves** — isolated VMs with no network, no storage, and no SSH access. Every response includes a cryptographically signed attestation document from the AWS Nitro Secure Module, proving:
+
+- The exact code that produced the result (PCR2 hash)
+- The exact kernel it ran on (PCR1 hash)
+- The exact enclave image (PCR0 hash)
+- A timestamp and nonce binding the attestation to your specific request
+
+PCR measurements are published on-chain (Base mainnet) after each deployment, so anyone can verify without trusting LogicNodes.
+
+This is the infrastructure behind the "mathematically unhackable" claim — not marketing, just math.
 
 ## Docs
 
