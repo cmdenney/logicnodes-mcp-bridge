@@ -5,7 +5,7 @@
     {
       "registryType": "npm",
       "identifier": "@logicnodez/mcp-bridge",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "transport": {
         "type": "stdio"
       },
