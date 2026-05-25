@@ -1,3 +1,5 @@
+<img src="https://logicnodes.io/logo-black.jpg" alt="LogicNodes" width="80" />
+
 # @logicnodez/mcp-bridge
 
 Connect any MCP-compatible AI agent (Claude Desktop, Cursor, Windsurf, Cline, etc.) to the **LogicNodes x402 marketplace** — 619 pay-per-call deterministic microservices.
