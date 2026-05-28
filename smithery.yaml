@@ -1,5 +1,5 @@
 name: logicnodes
-displayName: "LogicNodes \xe2\x80\x94 Agent Infrastructure"
+displayName: "LogicNodes — Agent Infrastructure"
 description: "Agent-to-agent payment, identity, and compliance infrastructure for autonomous AI on Base. 9 deterministic services: gas oracle, sig verify, peg monitor, escrow verifier, identity register, inference attestation, reputation lookup, compliance sentry, ZK compute attestation. All payable via x402 USDC."
 version: "1.0.0"
 author: "DENNEYTRADINGCO LLC"
@@ -17,7 +17,7 @@ startCommand:
   commandFunction: |-
     (config) => ({
       command: "node",
-      args: ["/root/mcp-bridge/index.js"],
+      args: ["index.js"],
       env: {
         LOGICNODES_API_KEY: config.apiKey || "free-trial"
       }
