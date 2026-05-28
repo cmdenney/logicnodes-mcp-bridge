@@ -1,17 +1,33 @@
+name: logicnodes
+displayName: "LogicNodes \xe2\x80\x94 Agent Infrastructure"
+description: "Agent-to-agent payment, identity, and compliance infrastructure for autonomous AI on Base. 9 deterministic services: gas oracle, sig verify, peg monitor, escrow verifier, identity register, inference attestation, reputation lookup, compliance sentry, ZK compute attestation. All payable via x402 USDC."
+version: "1.0.0"
+author: "DENNEYTRADINGCO LLC"
+homepage: "https://logicnodes.io"
+license: MIT
 startCommand:
   type: stdio
   configSchema:
     type: object
     properties:
-      logicnodesApiKey:
+      apiKey:
         type: string
-        description: 'Optional pre-paid API key. Leave blank to use x402 pay-per-call with USDC.'
+        description: "Your LogicNodes API key (get free at https://logicnodes.io/app)"
     required: []
   commandFunction: |-
     (config) => ({
-      command: 'npx',
-      args: ['-y', '@logicnodez/mcp-bridge'],
+      command: "node",
+      args: ["/root/mcp-bridge/index.js"],
       env: {
-        ...(config.logicnodesApiKey ? { LOGICNODES_API_KEY: config.logicnodesApiKey } : {})
+        LOGICNODES_API_KEY: config.apiKey || "free-trial"
       }
     })
+tags:
+  - blockchain
+  - base
+  - usdc
+  - agent
+  - identity
+  - compliance
+  - zk
+  - defi
