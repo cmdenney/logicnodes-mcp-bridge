@@ -1,162 +1,202 @@
 #!/usr/bin/env node
-// @logicnodes/mcp-bridge
-// Connects AI agents (Claude, Cursor, Windsurf, etc.) to the LogicNodes x402 marketplace.
-// Pay per call with USDC on Base, Arc, Arbitrum, Optimism, Polygon, Solana.
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import https from "https";
 
-const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
-const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
-const { CallToolRequestSchema, ListToolsRequestSchema } = require('@modelcontextprotocol/sdk/types.js');
-const https = require('https');
-const http = require('http');
+const LOGICNODES_BASE = "https://logicnodes.io";
+const API_KEY = process.env.LOGICNODES_API_KEY || "free-trial";
 
-const LOGICNODES_BASE = process.env.LOGICNODES_URL || 'https://logicnodes.io';
-const API_KEY = process.env.LOGICNODES_API_KEY || '';
+const server = new Server(
+  { name: "logicnodes", version: "1.0.0" },
+  { capabilities: { tools: {} } }
+);
 
-// Fetch service catalog from live hub
-async function fetchServices() {
-  return new Promise((resolve) => {
-    const url = new URL(LOGICNODES_BASE + '/mcp-config');
-    const lib = url.protocol === 'https:' ? https : http;
-    const req = lib.get(url.toString(), (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          resolve(json.services || []);
-        } catch { resolve([]); }
-      });
-    });
-    req.on('error', () => resolve([]));
-    req.setTimeout(8000, () => { req.destroy(); resolve([]); });
-  });
-}
-
-// Call a service on the hub
-async function callService(serviceName, params) {
+// Helper: POST to logicnodes endpoint
+function callEndpoint(path, body) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify(params || {});
-    const url = new URL(LOGICNODES_BASE + '/call/' + serviceName);
-    const lib = url.protocol === 'https:' ? https : http;
+    const payload = JSON.stringify(body || {});
+    const url = new URL(LOGICNODES_BASE + path);
     const options = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(body),
-        ...(API_KEY ? { 'X-Api-Key': API_KEY } : {})
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(payload),
+        "X-LogicNodes-Key": API_KEY
       }
     };
-    const req = lib.request(url.toString(), options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          if (res.statusCode === 402) {
-            resolve({ 
-              payment_required: true, 
-              instructions: json.detail,
-              message: 'Service requires USDC payment via x402. See instructions for payment details.'
-            });
-          } else {
-            resolve(json);
-          }
-        } catch { resolve({ raw: data }); }
+    const req = https.request(url.toString(), options, (res) => {
+      let data = "";
+      res.on("data", chunk => data += chunk);
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(data);
+        } else {
+          reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+        }
       });
     });
-    req.on('error', reject);
-    req.setTimeout(30000, () => { req.destroy(); reject(new Error('timeout')); });
-    req.write(body);
+    req.on("error", reject);
+    req.setTimeout(15000, () => { req.destroy(); reject(new Error("Request timeout")); });
+    req.write(payload);
     req.end();
   });
 }
 
-async function main() {
-  const server = new Server(
-    { name: 'logicnodes', version: '1.0.0' },
-    { capabilities: { tools: {} } }
-  );
-
-  // Discover tools from live catalog
-  let serviceCache = [];
-  let lastFetch = 0;
-
-  async function getServices() {
-    if (Date.now() - lastFetch > 300000 || serviceCache.length === 0) {
-      serviceCache = await fetchServices();
-      lastFetch = Date.now();
-    }
-    return serviceCache;
+const TOOLS = [
+  {
+    name: "logicnodes_gas_oracle",
+    description: "Real-time Base mainnet gas price oracle. Returns current base fee, priority fee, and EIP-1559 deviation from 7-day average. Cost: $0.0001 USDC per call.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        percentile: { type: "number", description: "Fee percentile (50, 75, 95, 99)", default: 50 }
+      },
+      required: []
+    },
+    endpoint: "/call/gas_oracle"
+  },
+  {
+    name: "logicnodes_sig_verify",
+    description: "Cryptographic signature verification on Base. Verifies EIP-712 typed data signatures and returns signer address with on-chain proof. Cost: $0.0001 USDC per call.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        message: { type: "string" },
+        signature: { type: "string" },
+        expected_signer: { type: "string", description: "Optional expected signer address" }
+      },
+      required: ["message", "signature"]
+    },
+    endpoint: "/call/sig_verify"
+  },
+  {
+    name: "logicnodes_peg_monitor",
+    description: "USDC peg stability monitor. Returns current USDC/USD deviation, Circle reserve attestation status, and depeg risk score. Cost: $0.0001 USDC per call.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        threshold_bps: { type: "number", description: "Alert threshold in basis points", default: 10 }
+      },
+      required: []
+    },
+    endpoint: "/call/peg_monitor"
+  },
+  {
+    name: "logicnodes_escrow_verifier",
+    description: "On-chain escrow state verifier. Checks LogicNodesEscrow contract for active escrow, balance, and release conditions. Cost: $0.001 USDC per call.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        escrow_id: { type: "string", description: "Escrow ID or transaction hash" },
+        party_address: { type: "string", description: "Address to check escrow for" }
+      },
+      required: ["escrow_id"]
+    },
+    endpoint: "/call/escrow_verifier"
+  },
+  {
+    name: "logicnodes_identity_register",
+    description: "Register an agent identity on Base mainnet via AgentIdentityRoot. Returns on-chain identity hash and registration transaction. Cost: $0.01 USDC per registration.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        agent_address: { type: "string", description: "Agent wallet address" },
+        capabilities: { type: "array", items: { type: "string" }, description: "List of agent capability strings" },
+        metadata_uri: { type: "string", description: "IPFS or HTTPS URI for agent metadata" }
+      },
+      required: ["agent_address", "capabilities"]
+    },
+    endpoint: "/call/identity_register"
+  },
+  {
+    name: "logicnodes_inference_attest",
+    description: "Attest an AI inference result on-chain via InferenceAttestationNetwork. Produces a signed POL receipt verifiable by any chain participant. Cost: $0.001 USDC per attestation.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        model_id: { type: "string" },
+        input_hash: { type: "string", description: "keccak256 of inference input" },
+        output_hash: { type: "string", description: "keccak256 of inference output" },
+        confidence: { type: "number", description: "Model confidence 0-1" }
+      },
+      required: ["model_id", "input_hash", "output_hash"]
+    },
+    endpoint: "/call/inference_attest"
+  },
+  {
+    name: "logicnodes_reputation_lookup",
+    description: "Look up an agent or wallet's on-chain reputation score from LogicNodes ERC-8004 graph. Returns RADC score, indispensability index, and active DTP count. Cost: $0.0001 USDC per call.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        address: { type: "string", description: "Wallet or agent contract address" }
+      },
+      required: ["address"]
+    },
+    endpoint: "/call/reputation_lookup"
+  },
+  {
+    name: "logicnodes_compliance_sentry",
+    description: "Autonomous regulatory attestation for agent transactions. Checks action against MiCA, EU AI Act, and US EO compliance rules. Returns attestation hash and compliance score. Cost: $0.01 USDC per check.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action_type: { type: "string", description: "Type of agent action (transfer, inference, governance, trade)" },
+        jurisdiction: { type: "string", description: "Regulatory jurisdiction (EU, US, GLOBAL)", default: "GLOBAL" },
+        amount_usd: { type: "number", description: "Transaction value in USD if applicable" }
+      },
+      required: ["action_type"]
+    },
+    endpoint: "/call/compliance_sentry"
+  },
+  {
+    name: "logicnodes_zk_compute_attest",
+    description: "Zero-knowledge compute attestation. Proves a computation was performed correctly without revealing inputs. Returns ZK proof hash anchored to Base via LogicNodesGraphCommitment. Cost: $0.05 USDC per proof.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        computation_hash: { type: "string", description: "Hash of the computation to attest" },
+        circuit_id: { type: "string", description: "ZK circuit identifier" },
+        public_inputs: { type: "array", items: { type: "string" } }
+      },
+      required: ["computation_hash", "circuit_id"]
+    },
+    endpoint: "/call/zk_compute_attest"
   }
+];
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => {
-    const services = await getServices();
-    const tools = services.slice(0, 200).map(svc => ({
-      name: svc.name || svc.service_name || 'unknown',
-      description: (svc.description || 'LogicNodes microservice') + ' | Pay: USDC via x402 on Base/Arc/Arbitrum',
-      inputSchema: svc.input_schema || {
-        type: 'object',
-        properties: {
-          input: { type: 'string', description: 'Input for this service' }
-        }
-      }
-    }));
-    // Always include a discovery tool
-    tools.unshift({
-      name: 'logicnodes_discover',
-      description: 'Search and discover available LogicNodes services. Returns service names, descriptions, and pricing.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          query: { type: 'string', description: 'Search query (e.g. "token price", "sentiment", "defi tvl")' }
-        }
-      }
-    });
-    return { tools };
-  });
-
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const { name, arguments: args } = request.params;
-
-    if (name === 'logicnodes_discover') {
-      const services = await getServices();
-      const q = (args?.query || '').toLowerCase();
-      const matches = q
-        ? services.filter(s => 
-            (s.name || '').toLowerCase().includes(q) || 
-            (s.description || '').toLowerCase().includes(q)
-          ).slice(0, 20)
-        : services.slice(0, 20);
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({ 
-            total_services: services.length,
-            matches: matches.map(s => ({ name: s.name, description: s.description, tier: s.tier, execution_url: s.execution_url }))
-          }, null, 2)
-        }]
-      };
-    }
-
-    try {
-      const result = await callService(name, args || {});
-      return {
-        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
-      };
-    } catch (err) {
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ error: err.message }) }],
-        isError: true
-      };
-    }
-  });
-
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  process.stderr.write('LogicNodes MCP Bridge running — ' + LOGICNODES_BASE + '\n');
-}
-
-main().catch(err => {
-  process.stderr.write('Fatal: ' + err.message + '\n');
-  process.exit(1);
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: TOOLS.map(t => ({
+      name: t.name,
+      description: t.description,
+      inputSchema: t.inputSchema
+    }))
+  };
 });
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+  const tool = TOOLS.find(t => t.name === name);
+  if (!tool) {
+    return {
+      content: [{ type: "text", text: `Unknown tool: ${name}` }],
+      isError: true
+    };
+  }
+  try {
+    const result = await callEndpoint(tool.endpoint, args || {});
+    return {
+      content: [{ type: "text", text: result }]
+    };
+  } catch (err) {
+    return {
+      content: [{ type: "text", text: `Error calling ${name}: ${err.message}` }],
+      isError: true
+    };
+  }
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
