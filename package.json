@@ -1,38 +1,14 @@
 {
-  "name": "@logicnodez/mcp-bridge",
-  "version": "1.0.1",
-  "description": "MCP bridge for LogicNodes \u2014 619 pay-per-call deterministic microservices. Pay USDC via x402 protocol on Base, Solana, Arc, Arbitrum, Optimism, Polygon, Ethereum, World Chain. No API key required.",
+  "name": "logicnodes-mcp",
+  "version": "1.0.0",
+  "description": "Agent-to-agent payment, identity, and compliance infrastructure for autonomous AI. 9 deterministic services payable via x402 USDC on Base.",
   "main": "index.js",
-  "bin": {
-    "logicnodes-mcp": "./index.js"
-  },
-  "scripts": {
-    "start": "node index.js"
-  },
-  "keywords": [
-    "mcp",
-    "x402",
-    "ai-agents",
-    "microservices",
-    "usdc",
-    "base",
-    "crypto",
-    "finance",
-    "defi",
-    "pay-per-call"
-  ],
-  "author": "LogicNodes <contact@htsnavigator.com>",
-  "license": "BSL-1.1",
-  "homepage": "https://logicnodes.io",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cmdenney/logicnodes-mcp-bridge"
-  },
+  "type": "module",
+  "scripts": {"start": "node index.js"},
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
-  "engines": {
-    "node": ">=18"
-  },
-  "mcpName": "io.github.cmdenney/logicnodes-mcp-bridge"
+  "keywords": ["mcp","ai-agent","blockchain","base","usdc","identity","compliance"],
+  "author": "DENNEYTRADINGCO LLC",
+  "license": "MIT"
 }
