@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-16/server.schema.json",
+  "name": "io.github.cmdenney/logicnodes-mcp",
+  "description": "Remote MCP for LogicNodes: 13 tools - payments, escrow, identity, compliance. x402 USDC on Base.",
+  "repository": {
+    "url": "https://github.com/cmdenney/logicnodes-mcp-bridge",
+    "source": "github"
+  },
+  "version": "1.0.1",
+  "websiteUrl": "https://logicnodes.io",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://logicnodes.io/mcp"
+    },
+    {
+      "type": "sse",
+      "url": "https://logicnodes.io/sse"
+    }
+  ]
+}

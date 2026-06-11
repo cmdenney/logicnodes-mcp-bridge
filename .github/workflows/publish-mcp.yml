@@ -27,3 +27,6 @@ jobs:
 
       - name: Publish server.json
         run: ./mcp-publisher publish
+
+      - name: Publish remote server listing
+        run: ./mcp-publisher publish --file server-remote.json
