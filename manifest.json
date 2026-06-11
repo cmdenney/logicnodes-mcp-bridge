@@ -1,0 +1,39 @@
+{
+  "name": "io.github.cmdenney/logicnodes-mcp-bridge",
+  "version": "1.0.3",
+  "description": "LogicNodes x402 Microservices Bridge",
+  "tools": [
+    {
+      "name": "agent_to_agent_escrow_verifier",
+      "description": "Leg 10 + COMMITTED-B: Deterministically arbitrates hires. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "x402_gas_oracle",
+      "description": "Leg 1: Real-time x402 gas oracle. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "x402_sig_verify",
+      "description": "Leg 2: Signature verification for x402. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "x402_peg_monitor",
+      "description": "Leg 3: Stablecoin peg monitoring. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "agent_compliance_sentry",
+      "description": "Leg 26 ARAL: Machine-readable AML/Sanctions screening. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "agent_identity_register",
+      "description": "Leg 17 UAIR: Cross-chain agent identity register. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "inference_attestation",
+      "description": "Leg 18: Deterministic LLM output proof. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    },
+    {
+      "name": "zk_compute_attest",
+      "description": "COMMITTED-A: Zero-knowledge compute attestation. Wraps existing x402 endpoint, auto-bills USDC to 0x78845031."
+    }
+  ]
+}

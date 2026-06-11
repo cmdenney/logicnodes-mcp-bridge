@@ -125,18 +125,6 @@ const TOOLS = [
     endpoint: "/call/inference_attest"
   },
   {
-    name: "logicnodes_reputation_lookup",
-    description: "Look up an agent or wallet's on-chain reputation score from LogicNodes ERC-8004 graph. Returns RADC score, indispensability index, and active DTP count. Cost: $0.0001 USDC per call.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        address: { type: "string", description: "Wallet or agent contract address" }
-      },
-      required: ["address"]
-    },
-    endpoint: "/call/reputation_lookup"
-  },
-  {
     name: "logicnodes_compliance_sentry",
     description: "Autonomous regulatory attestation for agent transactions. Checks action against MiCA, EU AI Act, and US EO compliance rules. Returns attestation hash and compliance score. Cost: $0.01 USDC per check.",
     inputSchema: {
