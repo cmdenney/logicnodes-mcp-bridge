@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-16/server.schema.json",
   "name": "io.github.cmdenney/logicnodes-mcp-bridge",
-  "description": "MCP bridge to LogicNodes: 8 deterministic on-chain service tools plus agent-marketplace discovery, payable per call in USDC via x402 on Base.",
+  "description": "8 deterministic on-chain service tools + agent marketplace. x402 USDC pay-per-call on Base.",
   "repository": {
     "url": "https://github.com/cmdenney/logicnodes-mcp-bridge",
     "source": "github"
