@@ -1,6 +1,6 @@
 {
   "name": "@logicnodez/mcp-bridge",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "MCP bridge to LogicNodes: 8 deterministic on-chain service tools plus agent-marketplace discovery, payable per call in USDC via x402 on Base.",
   "main": "index.js",
   "type": "module",
@@ -36,5 +36,6 @@
   ],
   "bin": {
     "logicnodes-mcp": "index.js"
-  }
+  },
+  "mcpName": "io.github.cmdenney/logicnodes-mcp-bridge"
 }
