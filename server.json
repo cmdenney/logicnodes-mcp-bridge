@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-16/server.schema.json",
   "name": "io.github.cmdenney/logicnodes-mcp-bridge",
-  "description": "8 deterministic on-chain service tools + agent marketplace. x402 USDC pay-per-call on Base.",
+  "description": "Signed PII-Shield: redact PII to an EIP-191 attestation, plus x402 pay-per-call agent tools.",
   "repository": {
     "url": "https://github.com/cmdenney/logicnodes-mcp-bridge",
     "source": "github"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@logicnodez/mcp-bridge",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "transport": {
         "type": "stdio"
       },
