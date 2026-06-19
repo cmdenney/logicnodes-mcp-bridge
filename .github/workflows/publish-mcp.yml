@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'server.json'
+      - 'server-remote.json'
       - 'package.json'
   workflow_dispatch:
 
@@ -26,7 +27,13 @@ jobs:
         run: ./mcp-publisher login github-oidc
 
       - name: Publish server.json
-        run: ./mcp-publisher publish 2>&1 | tee out1.log || grep -q "duplicate version" out1.log
+        shell: bash
+        run: |
+          set -o pipefail
+          ./mcp-publisher publish 2>&1 | tee out1.log || grep -q "duplicate version" out1.log
 
       - name: Publish remote server listing
-        run: ./mcp-publisher publish server-remote.json 2>&1 | tee out2.log || grep -q "duplicate version" out2.log
+        shell: bash
+        run: |
+          set -o pipefail
+          ./mcp-publisher publish server-remote.json 2>&1 | tee out2.log || grep -q "duplicate version" out2.log
